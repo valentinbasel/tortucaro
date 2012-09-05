@@ -22,7 +22,7 @@ _logger = logging.getLogger('turtleart-activity icaro plugin')
 import apicaro
 import time
 puerto = apicaro.puerto()
-puerto.PUERTO='/dev/ttyUSB0'
+puerto.PUERTO='/dev/ttyACM0'
 puerto.iniciar()
 class Icaro(Plugin):
     def __init__(self, parent):
@@ -33,8 +33,16 @@ class Icaro(Plugin):
         palette = make_palette('icaro',
                                colors=["#006060", "#A00000"],
                                help_string=_('paleta de bloques icaro'))
-
+        primitive_dictionary['motores'] = self._motores
+        palette.add_block('motores',  
+                     style='basic-style-1arg',  
+                     label=_('motores'),  
+                     prim_name='motores',
+                     default=[1],  
+                     help_string=_('activar los motores CC del integrado L293d'))
+        self._parent.lc.def_prim('motores', 1, lambda self, valor: primitive_dictionary['motores'](valor))
         primitive_dictionary['activar'] = self._activar
+
         palette.add_block('activar',  
                      style='basic-style-1arg',  
                      label=_('activar'),  
@@ -48,7 +56,7 @@ class Icaro(Plugin):
                      style='basic-style-1arg',  
                      label=_('abrir puerto'),  
                      prim_name='abrir',
-                     default=['/dev/ttyUSB0'],  
+                     default=['/dev/ttyACM0'],  
                      help_string=_('abre el puerto para comunicacion con la placa'))
         self._parent.lc.def_prim('abrir', 1, lambda self, valor: primitive_dictionary['abrir'](valor))
 
@@ -107,35 +115,152 @@ class Icaro(Plugin):
                      help_string=_('lee el valor del sensor 4 y devuelve 0 o 4'))
         self._parent.lc.def_prim('sensor4', 0, lambda self: primitive_dictionary['sensor4'](4))
 
-        primitive_dictionary['sensor5'] = self._sensor2
-        palette.add_block('sensor5',  
+        primitive_dictionary['sensoran1'] = self._sensoran
+        palette.add_block('sensoran1',  
                      style='box-style',  
-                     label=_('sensor5'),  
-                     prim_name='sensor5',  
-                     help_string=_('lee el valor del sensor 5 y devuelve 0 o 5'))
-        self._parent.lc.def_prim('sensor5', 0, lambda self: primitive_dictionary['sensor5'](5))
+                     label=_('sensoran1'),  
+                     prim_name='sensoran1',  
+                     help_string=_('lee el valor del sensor analogico 1 '))
+        self._parent.lc.def_prim('sensoran1', 0, lambda self: primitive_dictionary['sensoran1'](1))
 
-        primitive_dictionary['sensor6'] = self._sensor2
-        palette.add_block('sensor6',  
+        primitive_dictionary['sensoran2'] = self._sensoran
+        palette.add_block('sensoran2',  
                      style='box-style',  
-                     label=_('sensor6'),  
-                     prim_name='sensor6',  
-                     help_string=_('lee el valor del sensor 6 y devuelve 0 o 6'))
-        self._parent.lc.def_prim('sensor6', 0, lambda self: primitive_dictionary['sensor3'](6))
+                     label=_('sensoran2'),  
+                     prim_name='sensoran2',  
+                     help_string=_('lee el valor del sensor analogico 2 '))
+        self._parent.lc.def_prim('sensoran2', 0, lambda self: primitive_dictionary['sensoran2'](2))
+        
+
+        primitive_dictionary['sensoran3'] = self._sensoran
+        palette.add_block('sensoran3',  
+                     style='box-style',  
+                     label=_('sensoran3'),  
+                     prim_name='sensoran3',  
+                     help_string=_('lee el valor del sensor analogico 3 '))
+        self._parent.lc.def_prim('sensoran3', 0, lambda self: primitive_dictionary['sensoran3'](3))
+
+        primitive_dictionary['sensoran4'] = self._sensoran
+        palette.add_block('sensoran4',  
+                     style='box-style',  
+                     label=_('sensoran4'),  
+                     prim_name='sensoran4',  
+                     help_string=_('lee el valor del sensor analogico 4 '))
+        self._parent.lc.def_prim('sensoran4', 0, lambda self: primitive_dictionary['sensoran4'](4))
+
+        primitive_dictionary['sensoran5'] = self._sensoran
+        palette.add_block('sensoran5',  
+                     style='box-style',  
+                     label=_('sensoran5'),  
+                     prim_name='sensoran5',  
+                     help_string=_('lee el valor del sensor analogico 5 '))
+        self._parent.lc.def_prim('sensoran5', 0, lambda self: primitive_dictionary['sensoran5'](5))
+        
+        primitive_dictionary['sensoran6'] = self._sensoran
+        palette.add_block('sensoran6',  
+                     style='box-style',  
+                     label=_('sensoran6'),  
+                     prim_name='sensoran6',  
+                     help_string=_('lee el valor del sensor analogico 6 '))
+        self._parent.lc.def_prim('sensoran6', 0, lambda self: primitive_dictionary['sensoran6'](6))
+        
+        primitive_dictionary['sensoran7'] = self._sensoran
+        palette.add_block('sensoran7',  
+                     style='box-style',  
+                     label=_('sensoran7'),  
+                     prim_name='sensoran7',  
+                     help_string=_('lee el valor del sensor analogico 7 '))
+        self._parent.lc.def_prim('sensoran7', 0, lambda self: primitive_dictionary['sensoran7'](7))
+        
+        primitive_dictionary['sensoran8'] = self._sensoran
+        palette.add_block('sensoran8',  
+                     style='box-style',  
+                     label=_('sensoran8'),  
+                     prim_name='sensoran8',  
+                     help_string=_('lee el valor del sensor analogico 8 '))
+        self._parent.lc.def_prim('sensoran8', 0, lambda self: primitive_dictionary['sensoran8'](8))
+        
+
+
+        primitive_dictionary['adelante'] = self._adelante
+        palette.add_block('adelante',  
+                     style='box-style',  
+                     label=_('adelante'),  
+                     prim_name='adelante',  
+                     help_string=_('mueve los dos motores en un sentido'))
+        self._parent.lc.def_prim('adelante', 0, lambda self: primitive_dictionary['adelante'](1))
+
+        primitive_dictionary['atras'] = self._atras
+        palette.add_block('atras',  
+                     style='box-style',  
+                     label=_('atras'),  
+                     prim_name='atras',  
+                     help_string=_('mueve los dos motores en sentido contrario'))
+        self._parent.lc.def_prim('atras', 0, lambda self: primitive_dictionary['atras'](1))
+
+        primitive_dictionary['izquierda'] = self._izquierda
+        palette.add_block('izquierda',  
+                     style='box-style',  
+                     label=_('izquierda'),  
+                     prim_name='atras',  
+                     help_string=_('izquierda'))
+        self._parent.lc.def_prim('izquierda', 0, lambda self: primitive_dictionary['izquierda'](1))
+
+        primitive_dictionary['derecha'] = self._derecha
+        palette.add_block('derecha',  
+                     style='box-style',  
+                     label=_('derecha'),  
+                     prim_name='derecha',  
+                     help_string=_('derecha'))
+        self._parent.lc.def_prim('derecha', 0, lambda self: primitive_dictionary['derecha'](1))
+
+        primitive_dictionary['parar'] = self._parar
+        palette.add_block('parar',  
+                     style='box-style',  
+                     label=_('parar'),  
+                     prim_name='parar',  
+                     help_string=_('parar'))
+        self._parent.lc.def_prim('parar', 0, lambda self: primitive_dictionary['parar'](1))
+    def _adelante(self,valor):
+        return 1
+    def _atras(self,valor):
+        return 2
+    def _izquierda(self,valor):
+        return 3
+    def _derecha(self,valor):
+        return 4
+    def _parar(self,valor):
+        return 5
 
     def _servo(self,valor,servo):
-        puerto.activar_servo(servo,valor)
+        puerto.activar_servo(int(servo),int(valor))
         
     def _activar(self,valor):
         puerto.activar(valor)
+
+    def _motores(self,valor):      
+        if valor==1:
+            puerto.motor("1")
+        if valor==2:
+            puerto.motor("2")
+        if valor==3:
+            puerto.motor("3")
+        if valor==4:
+            puerto.motor("4")
+        if valor==5:
+            puerto.motor("5")
 
     def _retardo(self,valor):
         time.sleep(valor/1000)
 
     def _sensor2(self,valor):
-        respuesta=puerto.leer(valor)
+        respuesta=puerto.leer_digital(valor)
         return respuesta
-        
+
+    def _sensoran(self,valor):
+        respuesta=puerto.leer_analogico(valor)
+        return respuesta
+
     def _abrir_puerto(self,valor):
         puerto.cerrar()
         puerto.PUERTO=str(valor)
